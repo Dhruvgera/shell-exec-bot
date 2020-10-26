@@ -29,7 +29,6 @@ settingmemth = []
 setpolling = []
 graphstart = datetime.now()
 
-stopmarkup = {'keyboard': [['Stop']]}
 hide_keyboard = {'hide_keyboard': True}
 
 def clearall(chat_id):
@@ -125,7 +124,7 @@ class YourBot(telepot.Bot):
                     except:
                         bot.sendMessage(chat_id, "Please send a proper numeric value higher than 10.")
                 elif msg['text'] == "/shell" and chat_id not in shellexecution:
-                    bot.sendMessage(chat_id, "Send me a shell command to execute", reply_markup=stopmarkup)
+                    bot.sendMessage(chat_id, "Send me a shell command to execute")
                     shellexecution.append(chat_id)
                 elif msg['text'] == "/setmem" and chat_id not in settingmemth:
                     bot.sendChatAction(chat_id, 'typing')
@@ -146,12 +145,22 @@ class YourBot(telepot.Bot):
 
                 elif chat_id in shellexecution:
                     bot.sendChatAction(chat_id, 'typing')
-                    p = Popen(msg['text'], shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-                    output = p.stdout.read()
-                    if output != b'':
-                        bot.sendMessage(chat_id, output, disable_web_page_preview=True)
-                    else:
-                        bot.sendMessage(chat_id, "No output.", disable_web_page_preview=True)
+                    if "/run" in msg['text']:
+                        a=str(msg['text'])
+                        b=[]
+                        sep=''
+                        for i in a:
+                            b.append(i)
+                        l=len(b)
+                        b=b[4:l]
+                        b=sep.join(b)
+                        bot.sendMessage(chat_id, b)
+                        p = Popen(b, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+                        output = p.stdout.read()
+                        if output != b'':
+                            bot.sendMessage(chat_id, output, disable_web_page_preview=True)
+                        else:
+                            bot.sendMessage(chat_id, "No output.", disable_web_page_preview=True)
                 elif msg['text'] == '/memgraph':
                     bot.sendChatAction(chat_id, 'typing')
                     tmperiod = "Last %.2f hours" % ((datetime.now() - graphstart).total_seconds() / 3600)
